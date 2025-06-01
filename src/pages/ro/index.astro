@@ -1,0 +1,31 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Game from '../../components/Game.astro';
+
+const translations = {
+  'game.title': 'Ghicește Instrumentul!',
+  'game.intro': 'Ascultă sunetul și ghicește ce instrument este!',
+  'game.playButton': 'Redă Sunetul 🔊',
+  'game.inputPlaceholder': 'Scrie răspunsul tău aici...',
+  'game.skipButton': 'Treci peste',
+  'game.guessButton': 'Trimite Răspunsul',
+  'footer.text': '© 2025 Jocul de Ghicit Instrumente Muzicale'
+};
+
+function t(key: string) {
+  return translations[key as keyof typeof translations] || key;
+}
+---
+
+<Layout lang="ro">
+  <div class="language-selector">
+    <a href="/en">English</a>
+    <a href="/ro" class="active">Română</a>
+  </div>
+  
+  <Game t={t} />
+  
+  <footer class="mt-8 text-center text-gray-500 text-sm">
+    <p>{t('footer.text')}</p>
+  </footer>
+</Layout>

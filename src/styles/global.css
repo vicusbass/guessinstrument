@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+/* Custom font */
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Ensure message area has a minimum height to prevent layout jumps */
+#message-area {
+    min-height: 3em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Language selector styles */
+.language-selector {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 50;
+}
+
+.language-selector a {
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    text-decoration: none;
+    color: #333;
+    background-color: white;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.language-selector a:hover {
+    background-color: #FFE66D;
+}
+
+.language-selector a.active {
+    background-color: #4ECDC4;
+    color: white;
+}
+
+/* Footer styles */
+footer {
+    margin-top: 2rem;
+    padding: 1rem;
+    text-align: center;
+    color: #666;
+    font-size: 0.875rem;
+}
+
+@media (max-width: 640px) {
+    .language-selector {
+        top: 0.5rem;
+        right: 0.5rem;
+    }
+    
+    .language-selector a {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+}

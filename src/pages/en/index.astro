@@ -1,0 +1,31 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Game from '../../components/Game.astro';
+
+const translations = {
+  'game.title': 'Guess the Instrument!',
+  'game.intro': 'Listen to the sound and guess what it is!',
+  'game.playButton': 'Play Sound 🔊',
+  'game.inputPlaceholder': 'Type your guess here...',
+  'game.skipButton': 'Skip',
+  'game.guessButton': 'Submit Guess',
+  'footer.text': '© 2025 Musical Guess Game'
+};
+
+function t(key: string) {
+  return translations[key as keyof typeof translations] || key;
+}
+---
+
+<Layout lang="en">
+  <div class="language-selector">
+    <a href="/en" class="active">English</a>
+    <a href="/ro">Română</a>
+  </div>
+  
+  <Game t={t} />
+  
+  <footer class="mt-8 text-center text-gray-500 text-sm">
+    <p>{t('footer.text')}</p>
+  </footer>
+</Layout>

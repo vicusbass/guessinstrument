@@ -1,0 +1,47 @@
+---
+const { t, lang = 'en' } = Astro.props;
+---
+
+<div id="game-container" class="bg-white p-6 md:p-10 rounded-xl shadow-2xl w-full max-w-4xl text-center flex flex-col min-h-[80vh]">
+    <header class="mb-6">
+        <h1 class="text-3xl md:text-4xl font-bold text-sky-600">{t ? t('game.title') : 'Guess the Instrument!'}</h1>
+        <p class="text-sm text-gray-500 mt-1">{t ? t('game.intro') : 'Listen to the sound and guess what it is!'}</p>
+    </header>
+
+    <div id="instrument-display" class="mb-6 flex-grow flex items-center justify-center">
+        <img id="instrument-image" src="https://placehold.co/400x300/E0E0E0/999999?text=Get+Ready!" alt="Instrument Image" class="w-full h-auto max-h-96 object-contain rounded-lg shadow-md mx-auto border border-gray-200">
+    </div>
+    
+    <button id="play-sound-button" class="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-6 rounded-lg text-lg shadow-md hover:shadow-lg transition-all duration-150 ease-in-out mb-6 max-w-md mx-auto w-full focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-opacity-75">
+        {t ? t('game.playButton') : 'Play Sound 🔊'}
+    </button>
+
+    <div class="mb-4 max-w-md mx-auto w-full">
+        <input type="text" id="guess-input" placeholder={t ? t('game.inputPlaceholder') : 'Type your guess here...'} class="w-full px-4 py-3 border-2 border-sky-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none text-lg text-gray-700 placeholder-gray-400">
+    </div>
+
+    <div class="flex gap-2 max-w-md mx-auto w-full">
+        <button id="skip-button" class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium py-2 px-4 rounded-lg flex-1 transition-all duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75">
+            {t ? t('game.skipButton') : 'Another'}
+        </button>
+        <button id="submit-guess" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-6 rounded-lg flex-[2] transition-all duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-opacity-75">
+            {t ? t('game.guessButton') : 'Submit Guess'}
+        </button>
+    </div>
+
+    <div id="message-area" class="mt-6 text-center font-medium text-lg">
+        <!-- Feedback messages will appear here -->
+    </div>
+</div>
+
+<script src="../scripts/gameLogic.js"></script>
+
+<style>
+  /* Add any component-specific styles here */
+  @media (max-width: 768px) {
+    #game-container {
+      min-height: 70vh;
+      padding: 1rem;
+    }
+  }
+</style>
