@@ -1,31 +1,81 @@
 // Game logic script for the instrument guessing game
 import { instruments, getRandomInstrument, checkAnswer } from '../data/instruments.js';
-import * as Tone from 'tone';
 import confetti from 'canvas-confetti';
+
+// Flag to prevent multiple rapid clicks
+let isPlayingSound = false;
 
 // Initialize the game when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     // Get the current language from HTML
     const currentLang = document.documentElement.lang || 'en';
-    console.log('Current language:', currentLang);
-    
-    // Game state variables
-    let currentInstrument = null;
-    let hasPlayedSound = false;
-    let score = 0;
-    let wrongGuessCount = 0;
     
     // DOM elements
     const playButton = document.getElementById('play-sound-button');
     const guessInput = document.getElementById('guess-input');
     const submitButton = document.getElementById('submit-guess');
-    const skipButton = document.getElementById('skip-button');
+    const resetButton = document.getElementById('reset-button');
     const messageArea = document.getElementById('message-area');
     const instrumentImage = document.getElementById('instrument-image');
-
+    const scoreDisplay = document.getElementById('score');
+    
+    // Game state variables
+    let currentInstrument = null;
+    let currentlyPlayingInstrument = null; // Track which instrument is currently playing
+    let hasPlayedSound = false;
+    let score = 0;
+    let wrongGuessCount = 0;
+    
+    // Track progress through all instruments
+    let instrumentIds = Object.keys(instruments);
+    let currentInstrumentIndex = 0;
+    let completedInstruments = new Set();
+    
+    // Get the next instrument in sequence
+    function getNextInstrument() {
+        // Check if we've completed all instruments
+        if (completedInstruments.size >= instrumentIds.length) {
+            return null; // All instruments completed
+        }
+        
+        // Get the next instrument that hasn't been completed yet
+        let nextIndex = currentInstrumentIndex;
+        let attempts = 0;
+        
+        // Find the next uncompleted instrument
+        while (attempts < instrumentIds.length) {
+            const instrumentId = instrumentIds[nextIndex];
+            if (!completedInstruments.has(instrumentId)) {
+                // Update the index for next time
+                currentInstrumentIndex = (nextIndex + 1) % instrumentIds.length;
+                
+                // Return the instrument with its ID
+                const instrument = instruments[instrumentId];
+                return { ...instrument, id: instrumentId };
+            }
+            
+            // Move to the next instrument
+            nextIndex = (nextIndex + 1) % instrumentIds.length;
+            attempts++;
+        }
+        
+        return null; // All instruments completed (fallback)
+    }
+    
     // Initialize the game state
     function initGame() {
-        currentInstrument = getRandomInstrument();
+        // Only get a new instrument if we don't already have one
+        // or if we're explicitly resetting the game
+        if (!currentInstrument) {
+            currentInstrument = getNextInstrument();
+            console.log('New instrument initialized:', currentInstrument?.id, currentInstrument?.name?.en);
+            console.log('Instrument details:', {
+                id: currentInstrument?.id,
+                name: currentInstrument?.name,
+                sound: currentInstrument?.sound,
+                image: currentInstrument?.image
+            });
+        }
         hasPlayedSound = false;
         wrongGuessCount = 0; // Reset wrong guess counter for new instrument
         
@@ -55,56 +105,140 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Variable to keep track of the current audio player
-    let currentPlayer = null;
-    
     // Function to stop any currently playing sound
     function stopSound() {
-        if (currentPlayer) {
-            console.log('Stopping current sound');
-            currentPlayer.stop();
-            currentPlayer.dispose();
-            currentPlayer = null;
-        }
+        // Find any audio elements that might be playing
+        const audioElements = document.querySelectorAll('audio');
+        audioElements.forEach(audio => {
+            console.log('Stopping audio element');
+            try {
+                audio.pause();
+                audio.remove(); // Remove the element completely
+            } catch (e) {
+                console.error('Error stopping audio:', e);
+            }
+        });
+        
+        // Reset the playing flag when stopping sound
+        isPlayingSound = false;
+    }
+    
+    // Function to ensure all audio is stopped before proceeding
+    function ensureAudioStopped() {
+        return new Promise(resolve => {
+            stopSound();
+            // Add a small delay to ensure audio operations don't conflict
+            setTimeout(() => {
+                resolve();
+            }, 100); // 100ms delay should be enough
+        });
     }
     
     // Play the instrument sound
-    async function playSound() {
-        if (!currentInstrument) {
-            console.error('No current instrument');
+    function playSound() {
+        // Prevent multiple rapid clicks
+        if (isPlayingSound) {
+            console.log('Already playing a sound, ignoring click');
             return;
         }
         
-        // Stop any currently playing sound first
-        stopSound();
+        // Set the flag to prevent multiple clicks
+        isPlayingSound = true;
         
-        console.log('Playing sound:', currentInstrument.sound);
-        
-        // Initialize Tone.js
-        try {
-            await Tone.start();
-            console.log('Tone.js started');
-            
-            // Create a new player for the sound
-            currentPlayer = new Tone.Player().toDestination();
-            
-            // Load and play the sound
-            await currentPlayer.load(currentInstrument.sound);
-            console.log('Sound loaded');
-            currentPlayer.start();
-            console.log('Sound started playing');
-            
-            hasPlayedSound = true;
-            if (playButton) {
-                playButton.textContent = '🔄 Play Again';
-            }
-        } catch (error) {
-            console.error('Error playing sound:', error);
-            if (messageArea) {
-                messageArea.textContent = 'Error playing sound. Please try again.';
-                messageArea.className = 'mt-6 text-center font-medium text-lg text-red-500';
-            }
+        // Make sure we have a current instrument
+        if (!currentInstrument) {
+            initGame();
         }
+
+        // If we've already guessed correctly, don't change the instrument
+        // This ensures we're always playing the sound for the current instrument
+        
+        if (!currentInstrument) {
+            console.error('No current instrument');
+            isPlayingSound = false; // Reset the flag
+            return;
+        }
+        
+        // Stop any currently playing sound first with a delay to prevent conflicts
+        ensureAudioStopped().then(() => {
+            // Store the currently playing instrument to ensure consistency
+            currentlyPlayingInstrument = currentInstrument;
+            
+            console.log('Playing instrument:', currentlyPlayingInstrument.id, currentlyPlayingInstrument.name.en);
+            console.log('Sound file path:', currentlyPlayingInstrument.sound);
+        
+            try {
+                // Create a completely new audio element each time
+                const audioPlayer = document.createElement('audio');
+                audioPlayer.id = 'instrument-audio-player';
+                document.body.appendChild(audioPlayer); // Add to DOM for proper cleanup later
+                
+                // Set up event listeners
+                audioPlayer.oncanplaythrough = function() {
+                    console.log('Audio can play through');
+                };
+                
+                audioPlayer.onplay = function() {
+                    console.log('Audio started playing');
+                    hasPlayedSound = true;
+                    if (playButton) {
+                        playButton.textContent = '🔄 Play Again';
+                    }
+                };
+                
+                audioPlayer.onended = function() {
+                    console.log('Audio playback ended');
+                    isPlayingSound = false; // Reset the flag when audio ends
+                    // Remove the audio element when done
+                    setTimeout(() => {
+                        audioPlayer.remove();
+                    }, 100);
+                };
+                
+                audioPlayer.onerror = function(e) {
+                    console.error('Error playing audio:', e);
+                    isPlayingSound = false; // Reset the flag on error
+                    if (messageArea) {
+                        messageArea.textContent = 'Error playing sound. Please try again.';
+                        messageArea.className = 'mt-6 text-center font-medium text-lg text-red-500';
+                    }
+                    // Remove the audio element on error
+                    audioPlayer.remove();
+                };
+                
+                // Set the source and load the audio
+                audioPlayer.src = currentlyPlayingInstrument.sound;
+                
+                // Play the audio (this returns a promise)
+                const playPromise = audioPlayer.play();
+                
+                // Handle the play promise
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        console.log('Play promise resolved successfully');
+                    }).catch(error => {
+                        console.error('Playback failed:', error);
+                        isPlayingSound = false; // Reset the flag on play error
+                        if (messageArea) {
+                            messageArea.textContent = 'Error playing sound. Please try again.';
+                            messageArea.className = 'mt-6 text-center font-medium text-lg text-red-500';
+                        }
+                        // Remove the audio element on error
+                        audioPlayer.remove();
+                    });
+                }
+            } catch (error) {
+                console.error('Error setting up audio:', error);
+                isPlayingSound = false; // Reset the flag on error
+                if (messageArea) {
+                    messageArea.textContent = 'Error playing sound. Please try again.';
+                    messageArea.className = 'mt-6 text-center font-medium text-lg text-red-500';
+                }
+            }
+        }).catch(error => {
+            console.error('Error in ensureAudioStopped:', error);
+            isPlayingSound = false; // Reset the flag on error
+        });
     }
     
     // Check the user's guess
@@ -126,30 +260,93 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // Check if the guess is correct
-        const isCorrect = checkAnswer(userGuess, currentInstrument.id);
+        // Use the currently playing instrument for consistency
+        if (!currentlyPlayingInstrument) {
+            console.error('No currently playing instrument found');
+            if (messageArea) {
+                messageArea.textContent = 'Please play the sound first!';
+                messageArea.className = 'mt-6 text-center font-medium text-lg text-amber-500';
+            }
+            return;
+        }
+        
+        // Debug the current instrument before checking
+        console.log('Current instrument when checking guess:', currentInstrument.id, currentInstrument.name.en);
+        console.log('Currently playing instrument:', currentlyPlayingInstrument.id, currentlyPlayingInstrument.name.en);
+        console.log('Currently playing instrument image path:', currentlyPlayingInstrument.image);
+        
+        // Check if the guess is correct using the currently playing instrument
+        const isCorrect = checkAnswer(userGuess, currentlyPlayingInstrument.id);
         
         if (isCorrect) {
+            // Mark this instrument as completed
+            completedInstruments.add(currentlyPlayingInstrument.id);
+            console.log(`Marked ${currentlyPlayingInstrument.id} as completed. Total completed: ${completedInstruments.size}/${instrumentIds.length}`);
+            
+            // Check if all instruments have been completed
+            const allCompleted = completedInstruments.size >= instrumentIds.length;
+            
             // Success! Show the correct answer and confetti
             if (messageArea) {
-                messageArea.textContent = `Correct! It's a ${currentInstrument.name[currentLang]}!`;
-                messageArea.className = 'mt-6 text-center font-medium text-lg text-green-500';
+                if (allCompleted) {
+                    messageArea.textContent = `Congratulations! You've completed all ${instrumentIds.length} instruments!`;
+                    messageArea.className = 'mt-6 text-center font-bold text-xl text-green-500';
+                } else {
+                    messageArea.textContent = `Correct! It's a ${currentlyPlayingInstrument.name[currentLang]}!`;
+                    messageArea.className = 'mt-6 text-center font-medium text-lg text-green-500';
+                }
             }
             
             // Reset wrong guess counter on correct answer
             wrongGuessCount = 0;
             if (instrumentImage) {
-                instrumentImage.src = currentInstrument.image;
-                instrumentImage.alt = currentInstrument.name[currentLang];
+                console.log('Setting image for correct guess:', currentlyPlayingInstrument.id, currentlyPlayingInstrument.name.en);
+                console.log('Image path being set:', currentlyPlayingInstrument.image);
+                instrumentImage.src = currentlyPlayingInstrument.image;
+                instrumentImage.alt = currentlyPlayingInstrument.name[currentLang];
+                instrumentImage.style.display = 'block'; // Make sure the image is visible
+            }
+            
+            // Make sure the instrument display is visible and contains the image
+            const instrumentDisplay = document.getElementById('instrument-display');
+            if (instrumentDisplay) {
+                instrumentDisplay.style.display = 'block';
+                // Clear any existing content (like sad face)
+                instrumentDisplay.innerHTML = '';
+                // Add the image back if it's not already there
+                if (!instrumentDisplay.contains(instrumentImage) && instrumentImage) {
+                    instrumentDisplay.appendChild(instrumentImage);
+                }
             }
             
             // Add confetti effect for success
-            confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: { y: 0.6 },
-                colors: ['#FF6B6B', '#4ECDC4', '#FFE66D']
-            });
+            if (completedInstruments.size >= instrumentIds.length) {
+                // More spectacular confetti for completing all instruments
+                const duration = 3000;
+                const end = Date.now() + duration;
+                
+                // Create a confetti interval for a more spectacular effect
+                const confettiInterval = setInterval(function() {
+                    if (Date.now() > end) {
+                        return clearInterval(confettiInterval);
+                    }
+                    
+                    confetti({
+                        particleCount: 50,
+                        spread: 80,
+                        origin: { x: Math.random(), y: Math.random() - 0.2 },
+                        colors: ['#FF6B6B', '#4ECDC4', '#FFE66D', '#FF9F1C', '#2EC4B6', '#E71D36']
+                    });
+                }, 200);
+            } else {
+                // Regular confetti for individual success
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#FF6B6B', '#4ECDC4', '#FFE66D']
+                });
+            }
             
             // Disable input until next round
             if (guessInput) {
@@ -159,16 +356,55 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitButton.disabled = true;
             }
             
+            // Highlight the reset button to make it more visible
+            if (resetButton) {
+                resetButton.classList.remove('bg-gray-300', 'hover:bg-gray-400', 'text-gray-700');
+                resetButton.classList.add('bg-green-500', 'hover:bg-green-600', 'text-white', 'animate-pulse');
+            }
+            
             // Add a slight delay before allowing a new game
             setTimeout(() => {
+                // Check if all instruments have been completed
+                const allCompleted = completedInstruments.size >= instrumentIds.length;
+                
                 if (playButton) {
-                    playButton.textContent = 'Play New Sound 🎵';
-                    playButton.onclick = () => {
-                        initGame();
-                        if (guessInput) guessInput.disabled = false;
-                        if (submitButton) submitButton.disabled = false;
-                        if (playButton) playButton.onclick = playSound;
-                    };
+                    if (allCompleted) {
+                        // All instruments completed - change button text
+                        playButton.textContent = 'Start New Game 🎮';
+                        playButton.onclick = () => {
+                            // Reset the completed instruments tracking
+                            completedInstruments.clear();
+                            currentInstrumentIndex = 0;
+                            
+                            // Reset the game
+                            initGame();
+                            if (guessInput) guessInput.disabled = false;
+                            if (submitButton) submitButton.disabled = false;
+                            if (playButton) {
+                                playButton.textContent = 'Play Sound 🔊';
+                                playButton.onclick = playSound;
+                            }
+                            // Reset the button styling
+                            if (resetButton) {
+                                resetButton.classList.remove('bg-green-500', 'hover:bg-green-600', 'text-white', 'animate-pulse');
+                                resetButton.classList.add('bg-gray-300', 'hover:bg-gray-400', 'text-gray-700');
+                            }
+                        };
+                    } else {
+                        // Normal flow - just move to next instrument
+                        playButton.textContent = 'Play New Sound 🎵';
+                        playButton.onclick = () => {
+                            initGame();
+                            if (guessInput) guessInput.disabled = false;
+                            if (submitButton) submitButton.disabled = false;
+                            if (playButton) playButton.onclick = playSound;
+                            // Reset the button styling when starting a new game via play button
+                            if (resetButton) {
+                                resetButton.classList.remove('bg-green-500', 'hover:bg-green-600', 'text-white', 'animate-pulse');
+                                resetButton.classList.add('bg-gray-300', 'hover:bg-gray-400', 'text-gray-700');
+                            }
+                        };
+                    }
                 }
             }, 1500);
             
@@ -237,6 +473,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (instrumentImage) {
                 instrumentImage.src = currentInstrument.image;
                 instrumentImage.alt = currentInstrument.name[currentLang];
+                instrumentImage.style.display = 'block'; // Make sure the image is visible
+            }
+            
+            // Make sure the instrument display is visible and contains the image
+            const instrumentDisplay = document.getElementById('instrument-display');
+            if (instrumentDisplay) {
+                instrumentDisplay.style.display = 'block';
+                // Add the image back if it's not already there
+                if (!instrumentDisplay.contains(instrumentImage) && instrumentImage) {
+                    instrumentDisplay.innerHTML = ''; // Clear any existing content
+                    instrumentDisplay.appendChild(instrumentImage);
+                }
             }
             
             // Clear the input for another try
@@ -256,34 +504,86 @@ document.addEventListener('DOMContentLoaded', () => {
         submitButton.addEventListener('click', checkGuess);
     }
     
-    if (skipButton) {
-        skipButton.addEventListener('click', () => {
-            // Stop any currently playing sound
-            stopSound();
+    if (resetButton) {
+        resetButton.addEventListener('click', () => {
+            // Stop any currently playing sound with a delay to prevent conflicts
+            ensureAudioStopped().then(() => {
+                // Check if all instruments have been completed
+                const allCompleted = completedInstruments.size >= instrumentIds.length;
+                
+                if (allCompleted) {
+                    // Reset the completed instruments tracking for a new game
+                    completedInstruments.clear();
+                    currentInstrumentIndex = 0;
+                    if (messageArea) {
+                        messageArea.textContent = 'Starting a new game! Listen and guess the instruments.';
+                        messageArea.className = 'mt-6 text-center font-medium text-lg text-sky-500';
+                    }
+                }
+                
+                // Reset the currently playing instrument
+                currentlyPlayingInstrument = null;
+                
+                // Reset hasPlayedSound flag
+                hasPlayedSound = false;
+                
+                // Force a new instrument by setting currentInstrument to null first
+                currentInstrument = null;
+                
+                // Then get a new instrument in sequence
+                currentInstrument = getNextInstrument();
+                console.log('Reset: New instrument initialized:', currentInstrument?.id, currentInstrument?.name?.en);
+                
+                // Make sure all elements are reset and enabled
+                if (submitButton) submitButton.disabled = false;
+                if (resetButton) resetButton.disabled = false;
+                if (guessInput) {
+                    guessInput.disabled = false;
+                    guessInput.value = '';
+                    guessInput.focus();
+                }
+                if (messageArea) {
+                    messageArea.textContent = '';
+                    messageArea.className = 'mt-6 text-center font-medium text-lg hidden';
+                }
             
-            // Start a new game immediately without showing the answer
-            initGame();
-            
-            // Make sure all elements are reset and enabled
-            if (submitButton) submitButton.disabled = false;
-            if (skipButton) skipButton.disabled = false;
-            if (guessInput) {
-                guessInput.disabled = false;
-                guessInput.value = '';
-                guessInput.focus();
-            }
-            if (messageArea) {
-                messageArea.textContent = '';
-                messageArea.className = 'mt-6 text-center font-medium text-lg hidden';
-            }
-            
-            // Reset the instrument display in case it was showing a sad face
-            const instrumentDisplay = document.getElementById('instrument-display');
-            if (instrumentDisplay && instrumentImage) {
-                instrumentDisplay.innerHTML = '';
-                instrumentDisplay.appendChild(instrumentImage);
-                instrumentImage.style.display = 'block';
-            }
+                // Reset the instrument display and hide the image
+                const instrumentDisplay = document.getElementById('instrument-display');
+                if (instrumentDisplay) {
+                    // Clear any content (like sad face)
+                    instrumentDisplay.innerHTML = '';
+                    
+                    // Reset and hide the instrument image
+                    if (instrumentImage) {
+                        instrumentImage.src = '';
+                        instrumentImage.alt = '';
+                        instrumentImage.style.display = 'none';
+                        
+                        // Add back the empty instrument image element if needed
+                        if (!instrumentDisplay.contains(instrumentImage)) {
+                            instrumentDisplay.appendChild(instrumentImage);
+                        }
+                    }
+                }
+                
+                // Reset the play button text
+                if (playButton) {
+                    playButton.textContent = playButton.textContent.includes('Again') 
+                        ? 'Play Sound 🔊' 
+                        : playButton.textContent;
+                    playButton.onclick = playSound;
+                }
+                
+                // Reset the button styling
+                if (resetButton) {
+                    resetButton.classList.remove('bg-green-500', 'hover:bg-green-600', 'text-white', 'animate-pulse');
+                    resetButton.classList.add('bg-gray-300', 'hover:bg-gray-400', 'text-gray-700');
+                }
+            }).catch(error => {
+                console.error('Error in reset button handler:', error);
+                // Make sure to reset the playing flag even if there's an error
+                isPlayingSound = false;
+            });
         });
     }
     

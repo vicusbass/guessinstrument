@@ -17,8 +17,8 @@ export const instruments = {
             en: "Piano",
             ro: "Pian"
         },
-        sound: "/sounds/piano.mp3",
-        image: "/images/piano.jpg",
+        sound: "/sounds/piano.mp3", // Stays the same
+        image: "/images/piano.jpg", // Stays the same
         aliases: ["grand piano", "upright piano", "keyboard", "pian cu coada", "pianina"]
     },
     violin: {
@@ -26,8 +26,8 @@ export const instruments = {
             en: "Violin",
             ro: "Vioară"
         },
-        sound: "/sounds/piano.mp3",
-        image: "https://images.unsplash.com/photo-1465821185615-20b3c2fbf41b?w=600&h=400&fit=crop",
+        sound: "/sounds/violin.mp3",
+        image: "/images/violin.jpg",
         aliases: ["fiddle", "vioara", "violina"]
     },
     guitar: {
@@ -35,17 +35,35 @@ export const instruments = {
             en: "Guitar",
             ro: "Chitară"
         },
-        sound: "/sounds/piano.mp3",
-        image: "https://images.unsplash.com/photo-1525201548942-d8732f6617a0?w=600&h=400&fit=crop",
+        sound: "/sounds/guitar.mp3",
+        image: "/images/guitar.jpg",
         aliases: ["acoustic guitar", "chitara", "chitara acustica"]
+    },
+    electricguitar: {
+        name: {
+            en: "Electric Guitar",
+            ro: "Chitara"
+        },
+        sound: "/sounds/eguitar.mp3",
+        image: "/images/eguitar.png",
+        aliases: ["electric guitar", "chitara", "chitara electrică"]
+    },
+    bassguitar: {
+        name: {
+            en: "Bass Guitar",
+            ro: "Bass"
+        },
+        sound: "/sounds/bass.mp3",
+        image: "/images/bass.jpg",
+        aliases: ["bass guitar", "bass", "chitara bass"]
     },
     flute: {
         name: {
             en: "Flute",
             ro: "Flaut"
         },
-        sound: "/sounds/piano.mp3",
-        image: "https://images.unsplash.com/photo-1593789198777-f29bc259780e?w=600&h=400&fit=crop",
+        sound: "/sounds/flute.wav",
+        image: "/images/flute.jpg",
         aliases: ["transverse flute", "concert flute", "flaut", "flaut traversier"]
     },
     drums: {
@@ -53,8 +71,8 @@ export const instruments = {
             en: "Drums",
             ro: "Tobe"
         },
-        sound: "/sounds/piano.mp3",
-        image: "https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=600&h=400&fit=crop",
+        sound: "/sounds/drums.mp3",
+        image: "/images/drums.jpg",
         aliases: ["drum kit", "drum set", "percussion", "tobe", "set de tobe", "baterie"]
     },
     trumpet: {
@@ -62,8 +80,8 @@ export const instruments = {
             en: "Trumpet",
             ro: "Trompetă"
         },
-        sound: "/sounds/piano.mp3",
-        image: "https://images.unsplash.com/photo-1573871669414-010dbaf28a6b?w=600&h=400&fit=crop",
+        sound: "/sounds/trumpet.mp3",
+        image: "/images/trumpet.jpg",
         aliases: ["trompeta", "goarna"]
     },
     saxophone: {
@@ -71,8 +89,8 @@ export const instruments = {
             en: "Saxophone",
             ro: "Saxofon"
         },
-        sound: "/sounds/piano.mp3",
-        image: "https://images.unsplash.com/photo-1556806779-dd49e0c35a2f?w=600&h=400&fit=crop",
+        sound: "/sounds/saxophone.mp3",
+        image: "/images/saxophone.jpg",
         aliases: ["sax", "saxofon", "saxofonul"]
     },
     cello: {
@@ -80,8 +98,8 @@ export const instruments = {
             en: "Cello",
             ro: "Violoncel"
         },
-        sound: "/sounds/piano.mp3",
-        image: "https://images.unsplash.com/photo-1619096252214-ef06c45683e3?w=600&h=400&fit=crop",
+        sound: "/sounds/cello.mp3",
+        image: "/images/cello.jpg",
         aliases: ["violoncello", "violoncel", "cello"]
     },
     harp: {
@@ -89,8 +107,8 @@ export const instruments = {
             en: "Harp",
             ro: "Harpă"
         },
-        sound: "/sounds/piano.mp3",
-        image: "https://images.unsplash.com/photo-1563459802257-2a97df940f11?w=600&h=400&fit=crop",
+        sound: "/sounds/harp.mp3",
+        image: "/images/harp.jpg",
         aliases: ["concert harp", "arpa", "harpa"]
     },
     accordion: {
@@ -98,9 +116,37 @@ export const instruments = {
             en: "Accordion",
             ro: "Acordeon"
         },
-        sound: "/sounds/piano.mp3",
-        image: "https://images.unsplash.com/photo-1575900057347-7f9f97515e42?w=600&h=400&fit=crop",
+        sound: "/sounds/accordion.mp3", // Swapped with tambourine sound
+        image: "/images/accordion.jpg",
         aliases: ["squeezebox", "acordeon", "armonică"]
+    },
+    // New Instruments Start Here
+    xylophone: {
+        name: {
+            en: "Xylophone",
+            ro: "Xilofon"
+        },
+        sound: "/sounds/xylophone.mp3",
+        image: "/images/xylophone.jpg",
+        aliases: ["xylo", "xilofon"]
+    },
+    triangle: {
+        name: {
+            en: "Triangle",
+            ro: "Triunghi"
+        },
+        sound: "/sounds/triangle.mp3",
+        image: "/images/triangle.jpg",
+        aliases: ["trianglu", "muzical triangle", "triunghi"]
+    },
+    tambourine: {
+        name: {
+            en: "Tambourine",
+            ro: "Tamburina"
+        },
+        sound: "/sounds/tambourine.mp3", // Swapped with accordion sound
+        image: "/images/tambourine.jpg",
+        aliases: ["tambourin", "tambourin", "tamburina"]
     }
 };
 

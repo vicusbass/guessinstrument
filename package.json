@@ -13,8 +13,7 @@
     "astro": "^5.8.1",
     "canvas-confetti": "^1.6.0",
     "howler": "^2.2.4",
-    "tailwindcss": "^4.1.8",
-    "tone": "^14.8.49"
+    "tailwindcss": "^4.1.8"
   },
   "devDependencies": {
     "@types/canvas-confetti": "^1.9.0"
