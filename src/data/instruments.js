@@ -26,8 +26,8 @@ export const instruments = {
             en: "Violin",
             ro: "Vioară"
         },
-        sound: "/sounds/instruments/violin.mp3",
-        image: "/images/instruments/violin.jpg",
+        sound: "/sounds/violin.mp3",
+        image: "/images/violin.jpg",
         aliases: ["fiddle", "vioara", "violina"]
     },
     guitar: {
@@ -35,17 +35,35 @@ export const instruments = {
             en: "Guitar",
             ro: "Chitară"
         },
-        sound: "/sounds/instruments/guitar.mp3",
-        image: "/images/instruments/guitar.jpg",
+        sound: "/sounds/guitar.mp3",
+        image: "/images/guitar.jpg",
         aliases: ["acoustic guitar", "chitara", "chitara acustica"]
+    },
+    electricguitar: {
+        name: {
+            en: "Electric Guitar",
+            ro: "Chitara"
+        },
+        sound: "/sounds/eguitar.mp3",
+        image: "/images/eguitar.png",
+        aliases: ["electric guitar", "chitara", "chitara electrică"]
+    },
+    bassguitar: {
+        name: {
+            en: "Bass Guitar",
+            ro: "Bass"
+        },
+        sound: "/sounds/bass.mp3",
+        image: "/images/bass.jpg",
+        aliases: ["bass guitar", "bass", "chitara bass"]
     },
     flute: {
         name: {
             en: "Flute",
             ro: "Flaut"
         },
-        sound: "/sounds/instruments/flute.mp3",
-        image: "/images/instruments/flute.jpg",
+        sound: "/sounds/flute.wav",
+        image: "/images/flute.jpg",
         aliases: ["transverse flute", "concert flute", "flaut", "flaut traversier"]
     },
     drums: {
@@ -53,8 +71,8 @@ export const instruments = {
             en: "Drums",
             ro: "Tobe"
         },
-        sound: "/sounds/instruments/drums.mp3",
-        image: "/images/instruments/drums.jpg",
+        sound: "/sounds/drums.mp3",
+        image: "/images/drums.jpg",
         aliases: ["drum kit", "drum set", "percussion", "tobe", "set de tobe", "baterie"]
     },
     trumpet: {
@@ -62,8 +80,8 @@ export const instruments = {
             en: "Trumpet",
             ro: "Trompetă"
         },
-        sound: "/sounds/instruments/trumpet.mp3",
-        image: "/images/instruments/trumpet.jpg",
+        sound: "/sounds/trumpet.mp3",
+        image: "/images/trumpet.jpg",
         aliases: ["trompeta", "goarna"]
     },
     saxophone: {
@@ -71,8 +89,8 @@ export const instruments = {
             en: "Saxophone",
             ro: "Saxofon"
         },
-        sound: "/sounds/instruments/saxophone.mp3",
-        image: "/images/instruments/saxophone.jpg",
+        sound: "/sounds/saxophone.mp3",
+        image: "/images/saxophone.jpg",
         aliases: ["sax", "saxofon", "saxofonul"]
     },
     cello: {
@@ -80,8 +98,8 @@ export const instruments = {
             en: "Cello",
             ro: "Violoncel"
         },
-        sound: "/sounds/instruments/cello.mp3",
-        image: "/images/instruments/cello.jpg",
+        sound: "/sounds/cello.mp3",
+        image: "/images/cello.jpg",
         aliases: ["violoncello", "violoncel", "cello"]
     },
     harp: {
@@ -89,8 +107,8 @@ export const instruments = {
             en: "Harp",
             ro: "Harpă"
         },
-        sound: "/sounds/instruments/harp.mp3",
-        image: "/images/instruments/harp.jpg",
+        sound: "/sounds/harp.mp3",
+        image: "/images/harp.jpg",
         aliases: ["concert harp", "arpa", "harpa"]
     },
     accordion: {
@@ -98,8 +116,8 @@ export const instruments = {
             en: "Accordion",
             ro: "Acordeon"
         },
-        sound: "/sounds/instruments/accordion.mp3",
-        image: "/images/instruments/accordion.jpg",
+        sound: "/sounds/accordion.mp3", // Swapped with tambourine sound
+        image: "/images/accordion.jpg",
         aliases: ["squeezebox", "acordeon", "armonică"]
     },
     // New Instruments Start Here
@@ -108,90 +126,27 @@ export const instruments = {
             en: "Xylophone",
             ro: "Xilofon"
         },
-        sound: "/sounds/instruments/xylophone.mp3",
-        image: "/images/instruments/xylophone.jpg",
+        sound: "/sounds/xylophone.mp3",
+        image: "/images/xylophone.jpg",
         aliases: ["xylo", "xilofon"]
-    },
-    recorder: {
-        name: {
-            en: "Recorder",
-            ro: "Flaut dulce"
-        },
-        sound: "/sounds/instruments/recorder.mp3",
-        image: "/images/instruments/recorder.jpg",
-        aliases: ["blockflote", "flaut dulce", "recorder"]
-    },
-    tambourine: {
-        name: {
-            en: "Tambourine",
-            ro: "Tamburină"
-        },
-        sound: "/sounds/instruments/tambourine.mp3",
-        image: "/images/instruments/tambourine.jpg",
-        aliases: ["tamburina", "dairea"]
-    },
-    cymbals: {
-        name: {
-            en: "Cymbals",
-            ro: "Cinele"
-        },
-        sound: "/sounds/instruments/cymbals.mp3",
-        image: "/images/instruments/cymbals.jpg",
-        aliases: ["cimbal", "cinele", "talgere"]
-    },
-    clarinet: {
-        name: {
-            en: "Clarinet",
-            ro: "Clarinet"
-        },
-        sound: "/sounds/instruments/clarinet.mp3",
-        image: "/images/instruments/clarinet.jpg",
-        aliases: ["clarinet"]
     },
     triangle: {
         name: {
             en: "Triangle",
-            ro: "Trianglu"
+            ro: "Triunghi"
         },
-        sound: "/sounds/instruments/triangle.mp3",
-        image: "/images/instruments/triangle.jpg",
-        aliases: ["trianglu", "muzical triangle"]
+        sound: "/sounds/triangle.mp3",
+        image: "/images/triangle.jpg",
+        aliases: ["trianglu", "muzical triangle", "triunghi"]
     },
-    bongos: {
+    tambourine: {
         name: {
-            en: "Bongos",
-            ro: "Bongosuri"
+            en: "Tambourine",
+            ro: "Tamburina"
         },
-        sound: "/sounds/instruments/bongos.mp3",
-        image: "/images/instruments/bongos.jpg",
-        aliases: ["bongo drums", "bongosuri"]
-    },
-    harmonica: {
-        name: {
-            en: "Harmonica",
-            ro: "Muzicuță"
-        },
-        sound: "/sounds/instruments/harmonica.mp3",
-        image: "/images/instruments/harmonica.jpg",
-        aliases: ["muzicuță", "mouth organ"]
-    },
-    banjo: {
-        name: {
-            en: "Banjo",
-            ro: "Banjo"
-        },
-        sound: "/sounds/instruments/banjo.mp3",
-        image: "/images/instruments/banjo.jpg",
-        aliases: ["banjo"]
-    },
-    ukulele: {
-        name: {
-            en: "Ukulele",
-            ro: "Ukulele"
-        },
-        sound: "/sounds/instruments/ukulele.mp3",
-        image: "/images/instruments/ukulele.jpg",
-        aliases: ["ukulele", "uke"]
+        sound: "/sounds/tambourine.mp3", // Swapped with accordion sound
+        image: "/images/tambourine.jpg",
+        aliases: ["tambourin", "tambourin", "tamburina"]
     }
 };
 
